@@ -31,7 +31,7 @@ public class Main2 {
                     e.printStackTrace();
                 }
             }
-            if (Math.pow((int) Math.sqrt(element), 2) == element) {
+            else if (Math.pow((int) Math.sqrt(element), 2) == element) {
                 System.out.println(element);
             }
         }
