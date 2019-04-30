@@ -16,12 +16,14 @@ public class Generator {
     private static final int MAXN3 = 21;
     private int count = 0;
     private int size = 0;
+    private double probability;
 
     public void getFiles(String path, int n, int size, String[] words, double probability) {
         this.size = size;
         this.words = words;
+        this.probability = probability;
         for (int i = 0; i < n; i++) {
-            createFile(path, probability);
+            createFile(path);
         }
     }
 
@@ -33,9 +35,8 @@ public class Generator {
      * create one file with text
      *
      * @param path
-     * @param probability
      */
-    private void createFile(String path, double probability) {
+    private void createFile(String path) {
 
         StringBuilder text = new StringBuilder();
         int numOfParagraphs = getRandom(1, MAXN3);
@@ -83,7 +84,7 @@ public class Generator {
         int indexForInsertWordFromWords = getRandom(1, numOfWords);
         for (int i = 1; i < numOfWords; i++) {
             sentence.append(random.nextBoolean() ? ", " : " ");
-            if (i == indexForInsertWordFromWords && random.nextInt(3) == 0) {
+            if (i == indexForInsertWordFromWords && random.nextDouble() < probability) {
                 sentence.append(words[random.nextInt(words.length)]);
             } else {
                 sentence.append(doWord());
