@@ -20,6 +20,20 @@ public class MathBox extends ObjectBox {
         }
     }
 
+    @Override
+    public void add(Object o) {
+        if (o instanceof Number) {
+            super.add(o);
+        }
+        else {
+            try {
+                throw new ElementTypeInArrayException("Input object non Number type");
+            } catch (ElementTypeInArrayException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public double summator() {
         double result = 0;
         for (Object n : collection) {

@@ -16,6 +16,7 @@ public class Main {
         MathBox mathBox1 = new MathBox(array2);
         Object[] array3 = {"sadsd", new Object(), 2};
         MathBox mathBox2 = new MathBox(array3);
+        mathBox2.add(new Object());
 
     }
 }
