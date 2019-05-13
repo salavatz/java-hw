@@ -1,45 +1,60 @@
 package part01.lesson09.task01;
 
-import org.apache.commons.jci.compilers.CompilationResult;
-import org.apache.commons.jci.compilers.JavaCompiler;
-import org.apache.commons.jci.compilers.JavaCompilerFactory;
-import org.apache.commons.jci.readers.FileResourceReader;
-import org.apache.commons.jci.stores.FileResourceStore;
-
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        //createJavaFile();
-        JavaCompiler compiler = new JavaCompilerFactory().createCompiler("eclipse");
-        CompilationResult result = compiler.compile(
-                new String[]{"SomeClass.java"},
-                new FileResourceReader(new File("src/part01/lesson09/task01")),
-                new FileResourceStore(new File("src/part01/lesson09/task01"))
-        );
+        String javaFilePath = "src/part01/lesson09/task01/SomeClass.java";
+        String interfacePath = "src/part01/lesson09/task01/Worker.java";
+        String className = "part01.lesson09.task01.SomeClass";
+        compile(createJavaFile(javaFilePath, interfacePath, className));
+        load(className).doWork();
     }
 
-    private static void createJavaFile() {
-        Scanner scanner = new Scanner(System.in);
-        StringBuilder stringBuilder = new StringBuilder();
-        String line = null;
-        while (!(line = scanner.nextLine()).isEmpty ()) {
-            stringBuilder.append("        ").append(line).append("\n");
-        }
-        scanner.close();
-        try (PrintWriter writer = new PrintWriter("src/part01/lesson09/task01/SomeClass.java")){
-            String str = "package part01.lesson09.task01;\n" +
-                    "\n" +
-                    "public class SomeClass {\n" +
-                    "    public void doWork(){\n";
-            writer.write(str);
-            writer.write(String.valueOf(stringBuilder));
-            writer.write("    }\n}");
-        } catch (FileNotFoundException e) {
+    private static Worker load(String className) {
+        ClassLoader classLoader = new CustomClassLoader();
+        try {
+            Class<?> object = classLoader.loadClass(className);
+            return (Worker) object.newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    private static void compile(File javaFile) {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        compiler.run(null, null, null, javaFile.getPath());
+    }
+
+    private static File createJavaFile(String javaFilePath, String interfacePath, String className) {
+        Scanner scanner = new Scanner(System.in);
+        StringBuilder inputCode = new StringBuilder();
+        String line;
+        while (!(line = scanner.nextLine()).isEmpty()) {
+            inputCode.append("\t\t").append(line).append("\n");
+        }
+        scanner.close();
+        File file = new File(javaFilePath);
+        try {
+            int size = className.split("\\.").length;
+            String classContent = Files.lines(Paths.get(interfacePath)).
+                    reduce("", (a, b) -> a + "\n" + b).
+                    replace("interface", "class " + className.split("\\.")[size - 1] + " implements").
+                    replace("void", "public void").
+                    replace(");", "){\n" + inputCode + "\t}");
+            Files.write(file.toPath(), classContent.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return file;
     }
 }
+
