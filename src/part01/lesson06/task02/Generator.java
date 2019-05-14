@@ -11,9 +11,9 @@ public class Generator {
     private String[] words;
     private String[] endOfSentence = {"." + " ", "!" + " ", "?" + " "};
     private Random random = new Random();
-    private static final int MAXN1 = 16;
-    private static final int MAXN2 = 16;
-    private static final int MAXN3 = 21;
+    private static final int MAX_NUM_OF_WORDS = 16;
+    private static final int MAX_NUM_OF_SYMBOLS = 16;
+    private static final int MAX_NUM_OF_SENTENCES = 21;
     private int count = 0;
     private int size = 0;
     private double probability;
@@ -39,7 +39,7 @@ public class Generator {
     private void createFile(String path) {
 
         StringBuilder text = new StringBuilder();
-        int numOfParagraphs = getRandom(1, MAXN3);
+        int numOfParagraphs = getRandom(1, MAX_NUM_OF_SENTENCES);
         for (int i = 0; i < numOfParagraphs; i++) {
             StringBuilder str = doParagraph();
             text.append(str, 0, min(str.length(), size - text.length()));
@@ -61,7 +61,7 @@ public class Generator {
      * @return
      */
     private StringBuilder doParagraph() {
-        int numOfSentences = getRandom(1, MAXN3);
+        int numOfSentences = getRandom(1, MAX_NUM_OF_SENTENCES);
         StringBuilder paragraph = new StringBuilder();
         for (int i = 0; i < numOfSentences; i++) {
             paragraph.append(doSentence());
@@ -76,7 +76,7 @@ public class Generator {
      * @return
      */
     private StringBuilder doSentence() {
-        int numOfWords = getRandom(1, MAXN1);
+        int numOfWords = getRandom(1, MAX_NUM_OF_WORDS);
         StringBuilder sentence = new StringBuilder();
         String startOfSentence = doWord();
         startOfSentence = startOfSentence.substring(0, 1).toUpperCase() + startOfSentence.substring(1);
@@ -100,7 +100,7 @@ public class Generator {
      * @return
      */
     private String doWord() {
-        int numOfSymbols = getRandom(1, MAXN2);
+        int numOfSymbols = getRandom(1, MAX_NUM_OF_SYMBOLS);
         char[] word = new char[numOfSymbols];
         for (int i = 0; i < numOfSymbols; i++) {
             word[i] = (char) (getRandom('a', 26));
