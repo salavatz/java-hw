@@ -1,18 +1,18 @@
 package part01.lesson07.task01;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
-public class Factorial implements Callable<BigInteger[]> {
+public class Factorial implements Callable<BigInteger> {
 
     private BigInteger[] array;
+    private BigInteger number;
     private static Map<BigInteger, BigInteger> factorials = new HashMap<>();
 
-    private Factorial setArray(BigInteger[] array) {
-        this.array = array;
+    private Factorial setNumber(BigInteger number) {
+        this.number = number;
         return this;
     }
 
@@ -21,24 +21,12 @@ public class Factorial implements Callable<BigInteger[]> {
         for (int i = 0; i < array.length; i++) {
             this.array[i] = BigInteger.valueOf(array[i]);
         }
-        int sizeOfSubarray = array.length % 10 == 0 ? array.length / 10 : array.length / 10 + 1; //верхнее округление
-        int sizeOfLastSubarray = array.length - 10 * sizeOfSubarray;
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 10; i++) {
-            Future<BigInteger[]> future = executor.submit(new Factorial().setArray(Arrays.copyOfRange(
-                    this.array,
-                    i * sizeOfSubarray,
-                    i < 9 ? (i + 1) * sizeOfSubarray : array.length)));
+        for (int i = 0; i < array.length; i++) {
+            Future<BigInteger> future = executor.submit(new Factorial().setNumber(this.array[i]));
             try {
-                System.arraycopy(
-                        future.get(),
-                        0,
-                        this.array,
-                        i * sizeOfSubarray,
-                        i < 9 || array.length % 10 == 0 ? array.length / 10 : sizeOfLastSubarray);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+                this.array[i] = future.get();
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
@@ -56,21 +44,18 @@ public class Factorial implements Callable<BigInteger[]> {
         for (long i = 2; i <= number.longValue(); i++) {
             BigInteger j = BigInteger.valueOf(i);
             result = result.multiply(j);
+            factorials.put(BigInteger.valueOf(i), result);
         }
         return result;
     }
 
     @Override
-    public BigInteger[] call() {
-        for (int i = 0; i < array.length; i++) {
-            BigInteger number = array[i];
-            if (factorials.get(number) != null) {
-                array[i] = factorials.get(number);
-                continue;
-            }
-            array[i] = factorial(array[i]);
-            factorials.put(number, array[i]);
+    public BigInteger call() {
+        if (factorials.get(number) != null) {
+            return factorials.get(number);
         }
-        return array;
+        BigInteger result = factorial(number);
+        factorials.put(number, result);
+        return result;
     }
 }
