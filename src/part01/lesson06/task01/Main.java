@@ -19,10 +19,10 @@ public class Main {
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNext()) {
                 String line = scanner.nextLine().trim();
-                for (String str : line.split(" ")) {
-                    String result = str.replaceAll("[^а-яА-Я]", "").toLowerCase();
-                    if (!result.equals("")) {
-                        list.add(result);
+                line = line.replaceAll("[^а-яА-Я\\s\\-]", "").toLowerCase();
+                for (String str : line.split("\\s")) {
+                    if (!str.equals("")) {
+                        list.add(str);
                     }
                 }
             }
