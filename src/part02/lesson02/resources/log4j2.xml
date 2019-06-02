@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" name="baeldung" packages="">
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p %m%n"/>
+        </Console>
+
+        <File name="fout" fileName="baeldung.log" append="true">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+            </PatternLayout>
+        </File>
+
+        <JDBC name="DB" tableName="LOGS">
+            <ConnectionFactory class="part02.lesson02.ConnectionFactory" method="getConnection"/>
+            <Column name="id" pattern="%u" isUnicode="false"/>
+            <Column name="date" isEventTimestamp="true" isUnicode="false"/>
+            <Column name="log_level" pattern="%level" isUnicode="false"/>
+            <Column name="message" pattern="%m" isUnicode="false"/>
+            <Column name="exception" pattern="%throwable" isUnicode="false"/>
+        </JDBC>
+    </Appenders>
+
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="fout"/>
+            <AppenderRef ref="DB"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
