@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class Main {
     public static void main(String[] args) {
-        createTable();
+        //createTable();
         //insertIntoTableWithBatch();
         //insertIntoTableWithParameters();
         //getTableColumns(1212, "Bob");
@@ -120,15 +120,8 @@ public class Main {
             statement.executeUpdate();
             savepoint = connection.setSavepoint("a");
             statement.close();
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-        }
-        try {
-            PreparedStatement statement = connection.prepareStatement(insertTable1);
+
+            statement = connection.prepareStatement(insertTable1);
             statement.setInt(1, 5);
             statement.setString(2, "Bill");
             statement.setDate(3, Date.valueOf("2005-01-02"));
@@ -140,15 +133,21 @@ public class Main {
             connection.commit();
         } catch (SQLException e) {
             try {
-                connection.rollback(savepoint);
+                if (savepoint != null) {
+                    connection.rollback(savepoint);
+                } else {
+                    connection.rollback();
+                }
+                connection.commit();
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
-        }
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -168,33 +167,30 @@ public class Main {
             statement.executeUpdate();
             savepoint = connection.setSavepoint("a");
             statement.close();
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
-        }
-        try {
-            PreparedStatement statement = connection.prepareStatement(insertTable2);
+
+            statement = connection.prepareStatement(insertTable2);
             statement.setInt(1, 3);
             statement.setInt(2, 24); //ОШИБКА, добавили число вместо строки
             statement.setString(3, "description");
             statement.executeUpdate();
         } catch (SQLException e) {
             try {
-                connection.rollback(savepoint);
+                if (savepoint != null) {
+                    connection.rollback(savepoint);
+                } else {
+                    connection.rollback();
+                }
+                connection.commit();
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            connection.commit();
-            connection.setAutoCommit(true);
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
     }
 }
